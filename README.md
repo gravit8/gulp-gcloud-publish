@@ -29,7 +29,7 @@ If you would like to `gzip` the files, the plugin works best with [gulp-gzip](ht
 
 ```js
 const gulp = require('gulp');
-const gcPub = require('gulp-gcloud-publish');
+const gcPub = require('gulp-gcloud');
 const gzip = require('gulp-gzip'); // optional
 
 gulp.task('publish', function() {
