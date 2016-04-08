@@ -24,7 +24,7 @@ describe('gulp-gcloud-publish', function suite() {
   };
 
   storageStub.returns({ bucket: bucketStub });
-  bucketStub.returns({ file: fileStub, interceptors: [] });
+  bucketStub.returns({ file: fileStub });
   fileStub.returns({
     createWriteStream: createWriteStreamStub,
   });
@@ -120,7 +120,6 @@ describe('gulp-gcloud-publish', function suite() {
         contentEncoding: 'gzip',
       });
 
-      assert.equal(bucketStub.lastCall.returnValue.interceptors.length, 1);
       assert.ifError(/\.gz$/.test(file.path));
       done();
     })
