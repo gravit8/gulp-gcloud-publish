@@ -1,10 +1,13 @@
 {
-  "name": "gulp-gcloud-publish",
-  "version": "1.2.1",
+  "name": "gulp-gcloud",
+  "version": "2.0.0",
   "description": "Gulp task to publish to Google Clod Storage",
   "main": "./libs/index.js",
   "scripts": {
-    "test": "istanbul cover _mocha -- -R spec"
+    "test": "istanbul cover _mocha -- -R spec",
+    "pretest": "npm run compile",
+    "prepublish": "npm run compile",
+    "compile": "./node_modules/.bin/babel -d ./lib ./src"
   },
   "repository": {
     "type": "git",
@@ -21,19 +24,27 @@
   ],
   "author": "Alberto Restifo",
   "license": "Unlicense",
+  "contributors": [
+    "Vitaly Aminev <v@makeomatic.ru>"
+  ],
   "bugs": {
-    "url": "https://github.com/albertorestifo/gulp-gcloud-publish/issues"
+    "url": "https://github.com/AVVS/gulp-gcloud-publish/issues"
   },
-  "homepage": "https://github.com/albertorestifo/gulp-gcloud-publish#readme",
+  "homepage": "https://github.com/AVVS/gulp-gcloud-publish#readme",
   "dependencies": {
-    "gcloud": "^0.24.0",
+    "gcloud": "^0.30.0",
     "gulp-util": "^3.0.5",
     "mime": "^1.3.4",
+    "pump": "^1.0.1",
     "through2": "^2.0.0"
   },
   "devDependencies": {
+    "babel-preset-es2015": "^6.6.0",
+    "babel-preset-stage-0": "^6.5.0",
     "chai": "^3.0.0",
     "coveralls": "^2.11.2",
+    "eslint-config-airbnb": "^6.2.0",
+    "eslint-plugin-mocha": "^2.0.0",
     "event-stream": "^3.3.1",
     "istanbul": "^0.4.0",
     "mocha": "^2.2.5",

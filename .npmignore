@@ -1,0 +1,8 @@
+/coverage
+/src
+/test
+.babelrc
+.editorconfig
+.eslintrc
+.eslintignore
+.gitignore
