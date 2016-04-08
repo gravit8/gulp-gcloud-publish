@@ -99,13 +99,41 @@ function gPublish(options) {
 
   const storage = gcloud.storage(gcloudOptions);
   const bucket = storage.bucket(bucketName);
+  const predefinedAcl = pub ? 'publicRead' : null;
 
-  if (pub) {
-    bucket.interceptors.push({
-      request: (requestOptions) => {
-        requestOptions.qs.predefinedAcl = 'publicRead';
-      },
-    });
+  // Monkey-patch Gcloud File prototype
+  if (predefinedAcl) {
+    const File = require('gcloud/lib/storage/file');
+    const util = require('gcloud/lib/common/util');
+    const format = require('string-format-obj');
+    const is = require('is');
+    const STORAGE_UPLOAD_BASE_URL = 'https://www.googleapis.com/upload/storage/v1/b';
+    File.prototype.startSimpleUpload_ = function patchedSimpleUpload(dup, metadata) {
+      const self = this;
+      const reqOpts = {
+        qs: {
+          name: self.name,
+          predefinedAcl,
+        },
+        uri: format('{uploadBaseUrl}/{bucket}/o', {
+          uploadBaseUrl: STORAGE_UPLOAD_BASE_URL,
+          bucket: self.bucket.name,
+        }),
+      };
+
+      if (is.defined(this.generation)) {
+        reqOpts.qs.ifGenerationMatch = this.generation;
+      }
+
+      util.makeWritableStream(dup, {
+        metadata,
+        makeAuthenticatedRequest: this.storage.makeAuthenticatedRequest,
+        request: reqOpts,
+      }, (data) => {
+        self.metadata = data;
+        dup.emit('complete');
+      });
+    };
   }
 
   return through.obj((file, enc, done) => {
