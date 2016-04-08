@@ -148,7 +148,7 @@ function gPublish(options) {
     // Authenticate on Google Cloud Storage
     const gcPah = normalizePath(base, file);
     const gcFile = bucket.file(gcPah);
-    const stream = gcFile.createWriteStream({ metadata });
+    const stream = gcFile.createWriteStream({ metadata, resumable: false });
 
     return file
       .pipe(stream)
