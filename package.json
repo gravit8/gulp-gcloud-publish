@@ -1,8 +1,8 @@
 {
   "name": "gulp-gcloud",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Gulp task to publish to Google Clod Storage",
-  "main": "./libs/index.js",
+  "main": "./lib/index.js",
   "scripts": {
     "test": "istanbul cover _mocha -- -R spec",
     "pretest": "npm run compile",
