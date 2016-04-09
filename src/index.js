@@ -83,6 +83,7 @@ function assertConfiguration(options) {
  * @param {String}  [options.base='/']  - Base path for saving the file
  * @param {Boolean} [options.public]    - Set the file as public
  * @param {String}  [options.cacheControl] - Sets cache control for a given file
+ * @param {Function} [options.transformPath] - transforms file path
  */
 function gPublish(options) {
   // assert that we have correct configuration
@@ -94,6 +95,7 @@ function gPublish(options) {
     bucket: bucketName,
     public: pub,
     metadata: extraMetadata,
+    transformPath,
     ...gcloudOptions,
   } = options;
 
@@ -146,15 +148,15 @@ function gPublish(options) {
     const metadata = getMetadata(file, extraMetadata);
 
     // Authenticate on Google Cloud Storage
-    const gcPah = normalizePath(base, file);
-    const gcFile = bucket.file(gcPah);
+    const gcPath = transformPath ? transformPath(file) : normalizePath(base, file);
+    const gcFile = bucket.file(gcPath);
     const stream = gcFile.createWriteStream({ metadata, resumable: false });
 
     return file
       .pipe(stream)
       .on('error', done)
       .on('finish', () => {
-        logSuccess(gcPah);
+        logSuccess(gcPath);
         return done(null, file);
       });
   });

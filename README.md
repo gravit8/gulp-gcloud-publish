@@ -20,6 +20,7 @@ The plugin takes a configuration object with the following keys:
 - projectId `String`: Google Cloud Project ID ([docs][gc-docs])
 - base `String`: base path to use in the bucket, default to `/`
 - public `Boolean` (optional): If set to true, marks the uploaded file as public
+- transformPath `Function` (optional): pass function to transform upload path if base is not enough
 - metadata `Object` (optional): specify extra metadata for files
 - metadata.cacheControl `String` (optional): cache for 1 year, dont change assets, cache on intermidiary proxies `max-age=315360000, no-transform, public`
 
