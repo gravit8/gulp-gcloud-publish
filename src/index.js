@@ -117,7 +117,7 @@ function gPublish(options) {
     const gcFile = bucket.file(gcPath);
     const stream = gcFile.createWriteStream({ metadata, resumable: false, predefinedAcl });
 
-    return file.contents
+    return file
       .pipe(stream)
       .on('error', done)
       .on('finish', () => {

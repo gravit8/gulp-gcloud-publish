@@ -1,6 +1,6 @@
 {
   "name": "gulp-gcloud",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Gulp task to publish to Google Clod Storage",
   "main": "./lib/index.js",
   "scripts": {
