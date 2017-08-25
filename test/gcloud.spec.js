@@ -1,27 +1,23 @@
-'use strict';
-
 /** Test dependencies */
 const File = require('vinyl');
 const assert = require('assert');
 const _ = require('lodash');
-const es = require('event-stream');
 const rewire = require('rewire');
 const sinon = require('sinon');
 const through = require('through2');
-
-/** Tested module */
-const gcloud = rewire('../lib');
+const from = require('from2');
 
 describe('gulp-gcloud-publish', function suite() {
+  /** Tested module */
+  const gcloud = rewire('../src');
+
   /** Mock Gcloud */
   const storageStub = sinon.stub();
   const bucketStub = sinon.stub();
   const fileStub = sinon.stub();
   const createWriteStreamStub = sinon.stub();
 
-  const gcloudMock = {
-    storage: storageStub,
-  };
+  const gcloudMock = storageStub;
 
   storageStub.returns({ bucket: bucketStub });
   bucketStub.returns({ file: fileStub });
@@ -75,7 +71,7 @@ describe('gulp-gcloud-publish', function suite() {
   it('should set the correct metadata', function test(done) {
     createWriteStreamStub.returns(createFakeStream());
     const fakeFile = new File({
-      contents: es.readArray(['stream', 'with', 'those', 'contents']),
+      contents: from(['stream', 'with', 'those', 'contents']),
       cwd: '/',
       base: '/test/',
       path: '/test/file.css',
@@ -93,13 +89,13 @@ describe('gulp-gcloud-publish', function suite() {
 
       done();
     })
-    .on('error', done);
+      .on('error', done);
   });
 
   it('should recognise a gzip and make it public', function test(done) {
     createWriteStreamStub.returns(createFakeStream());
     const fakeFile = new File({
-      contents: es.readArray(['stream', 'with', 'those', 'contents']),
+      contents: from(['stream', 'with', 'those', 'contents']),
       cwd: '/',
       base: '/test/',
       path: '/test/file.css.gz',
@@ -113,23 +109,24 @@ describe('gulp-gcloud-publish', function suite() {
     const task = gcloud(config);
 
     task.write(fakeFile);
-    task.on('data', file => {
-      const metadata = createWriteStreamStub.args[1][0].metadata;
-      assert.deepEqual(metadata, {
-        contentType: 'text/css',
-        contentEncoding: 'gzip',
-      });
+    task
+      .on('data', (file) => {
+        const metadata = createWriteStreamStub.args[1][0].metadata;
+        assert.deepEqual(metadata, {
+          contentType: 'text/css',
+          contentEncoding: 'gzip',
+        });
 
-      assert.ifError(/\.gz$/.test(file.path));
-      done();
-    })
-    .on('error', done);
+        assert.ifError(/\.gz$/.test(file.path));
+        done();
+      })
+      .on('error', done);
   });
 
   it('should be called with a bucket home path', function test(done) {
     createWriteStreamStub.returns(createFakeStream());
     const fakeFile = new File({
-      contents: es.readArray(['stream', 'with', 'those', 'contents']),
+      contents: from(['stream', 'with', 'those', 'contents']),
       cwd: '/',
       base: '/test/',
       path: '/test/file.css',
@@ -138,17 +135,18 @@ describe('gulp-gcloud-publish', function suite() {
     const task = gcloud(exampleConfig);
 
     task.write(fakeFile);
-    task.on('data', () => {
-      assert(fileStub.lastCall.calledWith('file.css'));
-      done();
-    })
-    .on('error', done);
+    task
+      .on('data', () => {
+        assert(fileStub.lastCall.calledWith('file.css'));
+        done();
+      })
+      .on('error', done);
   });
 
-  it('should use the correct path when starting with a \/', function test(done) {
+  it('should use the correct path when starting with a /', function test(done) {
     createWriteStreamStub.returns(createFakeStream());
     const fakeFile = new File({
-      contents: es.readArray(['stream', 'with', 'those', 'contents']),
+      contents: from(['stream', 'with', 'those', 'contents']),
       cwd: '/',
       base: '/test/',
       path: '/test/file.css',
@@ -159,17 +157,18 @@ describe('gulp-gcloud-publish', function suite() {
     const task = gcloud(config);
 
     task.write(fakeFile);
-    task.on('data', () => {
-      assert(fileStub.lastCall.calledWith('test/file.css'));
-      done();
-    })
-    .on('error', done);
+    task
+      .on('data', () => {
+        assert(fileStub.lastCall.calledWith('test/file.css'));
+        done();
+      })
+      .on('error', done);
   });
 
-  it('should use the correct path when ending with a \/', function test(done) {
+  it('should use the correct path when ending with a /', function test(done) {
     createWriteStreamStub.returns(createFakeStream());
     const fakeFile = new File({
-      contents: es.readArray(['stream', 'with', 'those', 'contents']),
+      contents: from(['stream', 'with', 'those', 'contents']),
       cwd: '/',
       base: '/test/',
       path: '/test/file.css',
@@ -180,31 +179,33 @@ describe('gulp-gcloud-publish', function suite() {
     const task = gcloud(config);
 
     task.write(fakeFile);
-    task.on('data', () => {
-      assert(fileStub.lastCall.calledWith('test/file.css'));
-      done();
-    })
-    .on('error', done);
+    task
+      .on('data', () => {
+        assert(fileStub.lastCall.calledWith('test/file.css'));
+        done();
+      })
+      .on('error', done);
   });
 
-  it('should use the correct path when starting and ending with a \/', function test(done) {
+  it('should use the correct path when starting and ending with a /', function test(done) {
     createWriteStreamStub.returns(createFakeStream());
     const fakeFile = new File({
-      contents: es.readArray(['stream', 'with', 'those', 'contents']),
+      contents: from(['stream', 'with', 'those', 'contents']),
       cwd: '/',
       base: '/test/',
       path: '/test/file.css',
     });
 
     const config = _.clone(exampleConfig);
-    config.base = '/test/';
+    config.base = '/test';
     const task = gcloud(config);
 
     task.write(fakeFile);
-    task.on('data', () => {
-      assert(fileStub.lastCall.calledWith('test/file.css'));
-      done();
-    })
-    .on('error', done);
+    task
+      .on('data', () => {
+        assert(fileStub.lastCall.calledWith('test/file.css'));
+        done();
+      })
+      .on('error', done);
   });
 });

@@ -1,8 +1,11 @@
-const gcloud = require('gcloud');
+// eslint-disable-next-line no-var
+var gcloud = require('@google-cloud/storage');
+
 const gutil = require('gulp-util');
 const mime = require('mime');
 const through = require('through2');
 const assert = require('assert');
+const omit = require('lodash.omit');
 
 const PLUGIN_NAME = 'gulp-gcloud';
 const PluginError = gutil.PluginError;
@@ -14,10 +17,7 @@ const PluginError = gutil.PluginError;
  * @param {File} file
  */
 function getMetadata(file, extraMetadata = {}) {
-  const meta = {
-    ...extraMetadata,
-    contentType: mime.lookup(file.path),
-  };
+  const meta = Object.assign({ contentType: mime.lookup(file.path) }, extraMetadata);
 
   // Check if it's gziped
   if (file.contentEncoding && file.contentEncoding.indexOf('gzip') > -1) {
@@ -34,7 +34,6 @@ function getMetadata(file, extraMetadata = {}) {
  * @param file - File to save
  */
 function normalizePath(_base, file) {
-  const _relative = file.path.replace(file.base, '');
   let base = _base;
 
   // ensure there is a tailing slash in the base path
@@ -48,7 +47,7 @@ function normalizePath(_base, file) {
   }
 
   base = base || '';
-  return base + _relative;
+  return base + file.relative;
 }
 
 /**
@@ -96,51 +95,17 @@ function gPublish(options) {
     public: pub,
     metadata: extraMetadata,
     transformPath,
-    ...gcloudOptions,
   } = options;
 
-  const storage = gcloud.storage(gcloudOptions);
+  const gcloudOptions = omit(options, ['base', 'bucket', 'public', 'metadata', 'transformPath']);
+
+  const storage = gcloud(gcloudOptions);
   const bucket = storage.bucket(bucketName);
-  const predefinedAcl = pub ? 'publicRead' : null;
-
-  // Monkey-patch Gcloud File prototype
-  if (predefinedAcl) {
-    const File = require('gcloud/lib/storage/file');
-    const util = require('gcloud/lib/common/util');
-    const format = require('string-format-obj');
-    const is = require('is');
-    const STORAGE_UPLOAD_BASE_URL = 'https://www.googleapis.com/upload/storage/v1/b';
-    File.prototype.startSimpleUpload_ = function patchedSimpleUpload(dup, metadata) {
-      const self = this;
-      const reqOpts = {
-        qs: {
-          name: self.name,
-          predefinedAcl,
-        },
-        uri: format('{uploadBaseUrl}/{bucket}/o', {
-          uploadBaseUrl: STORAGE_UPLOAD_BASE_URL,
-          bucket: self.bucket.name,
-        }),
-      };
-
-      if (is.defined(this.generation)) {
-        reqOpts.qs.ifGenerationMatch = this.generation;
-      }
-
-      util.makeWritableStream(dup, {
-        metadata,
-        makeAuthenticatedRequest: this.storage.makeAuthenticatedRequest,
-        request: reqOpts,
-      }, (data) => {
-        self.metadata = data;
-        dup.emit('complete');
-      });
-    };
-  }
+  const predefinedAcl = pub ? 'publicRead' : undefined;
 
   return through.obj((file, enc, done) => {
     /* istanbul ignore next */
-    if (file.isNull()) {
+    if (file.isStream() !== true) {
       return done(null, file);
     }
 
@@ -150,9 +115,9 @@ function gPublish(options) {
     // Authenticate on Google Cloud Storage
     const gcPath = transformPath ? transformPath(file) : normalizePath(base, file);
     const gcFile = bucket.file(gcPath);
-    const stream = gcFile.createWriteStream({ metadata, resumable: false });
+    const stream = gcFile.createWriteStream({ metadata, resumable: false, predefinedAcl });
 
-    return file
+    return file.contents
       .pipe(stream)
       .on('error', done)
       .on('finish', () => {

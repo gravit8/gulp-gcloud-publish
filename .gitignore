@@ -11,8 +11,9 @@ pids
 logs
 results
 
-/node_modules
-/coverage
-/examples
-/.idea
-/lib
+.nyc_output
+node_modules
+coverage
+examples
+.idea
+lib
