@@ -1,6 +1,6 @@
 {
   "name": "gulp-gcloud",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Gulp task to publish to Google Clod Storage",
   "main": "./lib/index.js",
   "scripts": {
@@ -56,6 +56,6 @@
     "rewire": "^2.3.3",
     "sinon": "^3.2.1",
     "underscore": "^1.8.3",
-    "vinyl": "^2.1.0"
+    "vinyl": "1.x.x"
   }
 }

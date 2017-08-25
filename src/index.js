@@ -105,7 +105,7 @@ function gPublish(options) {
 
   return through.obj((file, enc, done) => {
     /* istanbul ignore next */
-    if (file.isStream() !== true) {
+    if (file.isNull() === true) {
       return done(null, file);
     }
 
