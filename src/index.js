@@ -117,13 +117,23 @@ function gPublish(options) {
     const gcFile = bucket.file(gcPath);
     const stream = gcFile.createWriteStream({ metadata, resumable: false, predefinedAcl });
 
-    return file
-      .pipe(stream)
-      .on('error', done)
-      .on('finish', () => {
-        logSuccess(gcPath);
-        return done(null, file);
-      });
+    if (file.isStream()) {
+      return file
+        .pipe(stream)
+        .on('error', done)
+        .on('finish', () => {
+          logSuccess(gcPath);
+          return done(null, file);
+        });
+    } else if (file.isBuffer()) {
+      return stream
+          .on('error', done)
+          .on('finish', () => {
+            logSuccess(gcPath);
+            return done(null, file);
+          })
+        .end(file.contents);
+    }
   });
 }
 
