@@ -2,14 +2,14 @@
 const File = require('vinyl');
 const assert = require('assert');
 const _ = require('lodash');
-const rewire = require('rewire');
 const sinon = require('sinon');
+const rewire = require('rewire');
 const through = require('through2');
 const from = require('from2');
 
 describe('gulp-gcloud-publish', function suite() {
   /** Tested module */
-  const gcloud = rewire('../src');
+  const gcloud = rewire('../');
 
   /** Mock Gcloud */
   const storageStub = sinon.stub();

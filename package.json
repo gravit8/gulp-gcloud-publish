@@ -2,12 +2,9 @@
   "name": "gulp-gcloud-publish",
   "version": "3.0.2",
   "description": "Gulp task to publish to Google Cloud Storage",
-  "main": "./lib/index.js",
+  "main": "index.js",
   "scripts": {
-    "test": "nyc mocha -R spec",
-    "pretest": "npm run compile",
-    "prepublishOnly": "npm run compile",
-    "compile": "babel -d ./lib ./src"
+    "test": "nyc mocha -R spec"
   },
   "repository": {
     "type": "git",
@@ -51,7 +48,7 @@
     "eslint-plugin-promise": "^3.5.0",
     "from2-array": "^0.0.4",
     "istanbul": "^0.4.0",
-    "mocha": "^3.5.0",
+    "mocha": "^3.5.3",
     "nyc": "^11.1.0",
     "rewire": "^2.3.3",
     "sinon": "^3.2.1",

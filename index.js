@@ -1,3 +1,5 @@
+'use strict';
+
 // eslint-disable-next-line no-var
 var gcloud = require('@google-cloud/storage');
 
@@ -7,7 +9,7 @@ const through = require('through2');
 const assert = require('assert');
 const omit = require('lodash.omit');
 
-const PLUGIN_NAME = 'gulp-gcloud';
+const PLUGIN_NAME = 'gulp-gcloud-publish';
 const PluginError = gutil.PluginError;
 
 /**
@@ -94,7 +96,7 @@ function gPublish(options) {
     bucket: bucketName,
     public: pub,
     metadata: extraMetadata,
-    transformPath,
+    transformPath
   } = options;
 
   const gcloudOptions = omit(options, ['base', 'bucket', 'public', 'metadata', 'transformPath']);
@@ -118,23 +120,18 @@ function gPublish(options) {
     const stream = gcFile.createWriteStream({ metadata, resumable: false, predefinedAcl });
 
     if (file.isStream()) {
-      return file
-        .pipe(stream)
-        .on('error', done)
-        .on('finish', () => {
-          logSuccess(gcPath);
-          return done(null, file);
-        });
+      return file.pipe(stream).on('error', done).on('finish', () => {
+        logSuccess(gcPath);
+        return done(null, file);
+      });
     } else if (file.isBuffer()) {
-      return stream
-          .on('error', done)
-          .on('finish', () => {
-            logSuccess(gcPath);
-            return done(null, file);
-          })
-        .end(file.contents);
+      return stream.on('error', done).on('finish', () => {
+        logSuccess(gcPath);
+        return done(null, file);
+      }).end(file.contents);
     }
   });
 }
 
 module.exports = gPublish;
+
