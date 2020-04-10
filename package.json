@@ -1,7 +1,7 @@
 {
-  "name": "gulp-gcloud",
+  "name": "gulp-gcloud-publish",
   "version": "3.0.2",
-  "description": "Gulp task to publish to Google Clod Storage",
+  "description": "Gulp task to publish to Google Cloud Storage",
   "main": "./lib/index.js",
   "scripts": {
     "test": "nyc mocha -R spec",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.comAVVS/gulp-gcloud-publish.git"
+    "url": "git+https://github.com/phoenix24/gulp-gcloud-publish.git"
   },
   "keywords": [
     "gcloud",
@@ -28,9 +28,9 @@
     "Vitaly Aminev <v@makeomatic.ca>"
   ],
   "bugs": {
-    "url": "https://github.com/AVVS/gulp-gcloud-publish/issues"
+    "url": "https://github.com/phoenix24/gulp-gcloud-publish/issues"
   },
-  "homepage": "https://github.com/AVVS/gulp-gcloud-publish#readme",
+  "homepage": "https://github.com/phoenix24/gulp-gcloud-publish#readme",
   "dependencies": {
     "@google-cloud/storage": "^4.7.0",
     "gulp-util": "^3.0.5",
