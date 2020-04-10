@@ -1,4 +1,3 @@
-/** Test dependencies */
 const File = require('vinyl');
 const assert = require('assert');
 const _ = require('lodash');
@@ -17,7 +16,7 @@ describe('gulp-gcloud-publish', function suite() {
   const fileStub = sinon.stub();
   const createWriteStreamStub = sinon.stub();
 
-  const gcloudMock = storageStub;
+  const storageMock = storageStub;
 
   storageStub.returns({ bucket: bucketStub });
   bucketStub.returns({ file: fileStub });
@@ -32,7 +31,7 @@ describe('gulp-gcloud-publish', function suite() {
     });
   }
 
-  gcloud.__set__('gcloud', gcloudMock);
+  gcloud.__set__('Storage', storageMock);
 
   const exampleConfig = {
     bucket: 'something',
@@ -86,7 +85,6 @@ describe('gulp-gcloud-publish', function suite() {
       assert.deepEqual(metadata, {
         contentType: 'text/css',
       });
-
       done();
     })
       .on('error', done);
@@ -116,8 +114,8 @@ describe('gulp-gcloud-publish', function suite() {
           contentType: 'text/css',
           contentEncoding: 'gzip',
         });
-	
-	//todo: fixme
+
+        //todo: fixme
         //assert.ifError(/\.gz$/.test(file.path));
         done();
       })
